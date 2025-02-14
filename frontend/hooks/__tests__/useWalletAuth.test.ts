@@ -21,22 +21,22 @@ describe("useWalletAuth", () => {
   });
 
   it("should initialize with undefined address", () => {
-    const { result } = renderHook(() => useWalletAuth());
-    expect(result.current.address).toBeUndefined();
+    const { result } = renderHook(() => useWalletAuth("nonce"));
+    expect(result.current.connectedWallet).toBeUndefined();
   });
 
   it("should set address to null if ethereum provider is not available", async () => {
-    const { result } = renderHook(() => useWalletAuth());
+    const { result } = renderHook(() => useWalletAuth("nonce"));
 
     await act(async () => {
       await result.current.connect(mockWindow);
     });
 
-    expect(result.current.address).toBeNull();
+    expect(result.current.connectedWallet).toBeNull();
   });
 
   it("should handle rejection during connection", async () => {
-    const { result } = renderHook(() => useWalletAuth());
+    const { result } = renderHook(() => useWalletAuth("nonce"));
 
     mockSigner.signMessage = jest
       .fn()
@@ -46,11 +46,11 @@ describe("useWalletAuth", () => {
       await result.current.connect(mockWindow, mockSigner, () => "message");
     });
 
-    expect(result.current.address).toBeUndefined();
+    expect(result.current.connectedWallet).toBeUndefined();
   });
 
   it("should connect and sign in successfully", async () => {
-    const { result } = renderHook(() => useWalletAuth());
+    const { result } = renderHook(() => useWalletAuth("nonce"));
 
     mockSigner.signMessage = jest.fn().mockResolvedValue("yup");
 
@@ -58,23 +58,25 @@ describe("useWalletAuth", () => {
       await result.current.connect(mockWindow, mockSigner, () => "message");
     });
 
-    expect(result.current.address).toBe(mockSigner.address);
+    expect(result.current.connectedWallet?.address).toBe(mockSigner.address);
+    expect(result.current.connectedWallet?.message).toBe("message");
+    expect(result.current.connectedWallet?.signature).toBe("yup");
   });
 
   it("should disconnect successfully", async () => {
-    const { result } = renderHook(() => useWalletAuth());
+    const { result } = renderHook(() => useWalletAuth("nonce"));
 
     mockSigner.signMessage = jest.fn().mockResolvedValue("yup");
 
     await act(async () => {
       await result.current.connect(mockWindow, mockSigner, () => "message");
     });
-    expect(result.current.address).not.toBeUndefined();
+    expect(result.current.connectedWallet).not.toBeUndefined();
 
     // Then disconnect
     await act(async () => {
       await result.current.disconnect();
     });
-    expect(result.current.address).toBeUndefined();
+    expect(result.current.connectedWallet).toBeUndefined();
   });
 });

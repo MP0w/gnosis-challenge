@@ -5,7 +5,7 @@ import { SiweMessage } from "siwe";
 
 interface Signer {
   address: string;
-  signMessage: (message: string) => Promise<void>;
+  signMessage: (message: string) => Promise<string>;
 }
 
 async function getBrowserSigner(window: Window) {
@@ -23,12 +23,17 @@ async function getBrowserSigner(window: Window) {
   return {
     address: signer.address,
     signMessage: async (message: string) => {
-      await signer.signMessage(message);
+      return await signer.signMessage(message);
     },
   } as Signer;
 }
 
-function createSiweMessage(window: Window, address: string, statement: string) {
+function createSiweMessage(
+  window: Window,
+  address: string,
+  statement: string,
+  nonce: string
+) {
   const scheme = window.location.protocol.slice(0, -1);
   const domain = window.location.host;
   const origin = window.location.origin;
@@ -41,17 +46,30 @@ function createSiweMessage(window: Window, address: string, statement: string) {
     uri: origin,
     version: "1",
     chainId: 1,
+    nonce,
   });
   return message.prepareMessage();
 }
 
-export function useWalletAuth() {
-  const [address, setAddress] = useState<string | undefined | null>(undefined);
+type ConnectedWaller = {
+  address: string;
+  message: string;
+  signature: string;
+};
+
+export function useWalletAuth(nonce: string) {
+  const [connectedWallet, setConnectedWallet] = useState<
+    ConnectedWaller | undefined | null
+  >(undefined);
   const signIn = useCallback(
     async ({ signer, message }: { signer: Signer; message: string }) => {
-      await signer.signMessage(message);
+      const signature = await signer.signMessage(message);
 
-      setAddress(signer.address);
+      setConnectedWallet({
+        address: signer.address,
+        message,
+        signature,
+      });
     },
     []
   );
@@ -60,35 +78,35 @@ export function useWalletAuth() {
     async (
       window: Window,
       messageSigner?: Signer,
-      createMessage?: () => string
+      createMessage?: (nonce: string) => string
     ) => {
       const signer = messageSigner ?? (await getBrowserSigner(window));
       if (!signer) {
-        setAddress(null);
+        setConnectedWallet(null);
         return;
       }
 
       const message =
-        createMessage?.() ??
-        createSiweMessage(window, signer.address, "Sign in");
+        createMessage?.(nonce) ??
+        createSiweMessage(window, signer.address, "Sign in", nonce);
 
       signIn({
         signer,
         message,
       }).catch(() => {
         console.info("user rejected");
-        setAddress(undefined);
+        setConnectedWallet(undefined);
       });
     },
-    [signIn]
+    [signIn, nonce]
   );
 
   const disconnect = useCallback(async () => {
-    setAddress(undefined);
+    setConnectedWallet(undefined);
   }, []);
 
   return {
-    address,
+    connectedWallet,
     connect,
     disconnect,
   };
