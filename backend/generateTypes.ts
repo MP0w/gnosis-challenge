@@ -26,7 +26,7 @@ const transformer = new Transform({
   },
 });
 
-const output = createWriteStream("../shared/types.ts");
+const output = createWriteStream("./dbTypes.ts");
 
 const combinedStream = new Writable({
   write(chunk, encoding, callback) {

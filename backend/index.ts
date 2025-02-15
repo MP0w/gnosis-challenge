@@ -5,9 +5,9 @@ configDotenv({ path: ".env" });
 configDotenv({ path: ".env.production", override: true });
 
 import express, { NextFunction, Request, Response } from "express";
-import { authRouter } from "./routes/auth";
+import { authRouter } from "./routes/authRouter";
 import session from "express-session";
-import { authenticatedRouter } from "./routes/authenticated/authenticatedRoutes";
+import { authenticatedRouter } from "./routes/authenticated/authenticatedRouter";
 
 const app = express();
 const PORT = process.env.PORT || 4000;

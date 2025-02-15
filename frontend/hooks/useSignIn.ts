@@ -1,5 +1,6 @@
 import { useCallback, useState } from "react";
 import { API_BASE_URL } from "./baseURL";
+import { User } from "@/app/contexts/AuthContext";
 
 async function signIn(message: string, signature: string) {
   const response = await fetch(`${API_BASE_URL}/sign-in`, {
@@ -8,6 +9,7 @@ async function signIn(message: string, signature: string) {
     headers: {
       "Content-Type": "application/json",
     },
+    credentials: "include",
   });
 
   if (!response.ok) {
@@ -18,17 +20,17 @@ async function signIn(message: string, signature: string) {
 }
 
 export function useSignIn() {
-  const [isSignedIn, setSignedIn] = useState<boolean | undefined>(undefined);
+  const [signedInUser, setSignedInUser] = useState<User | undefined>(undefined);
 
   const callback = useCallback(async (message: string, signature: string) => {
     signIn(message, signature)
-      .then(() => {
-        setSignedIn(true);
+      .then((user) => {
+        setSignedInUser(user);
       })
       .catch(() => {
-        setSignedIn(false);
+        setSignedInUser(undefined);
       });
   }, []);
 
-  return { signIn: callback, isSignedIn };
+  return { signIn: callback, signedInUser };
 }
