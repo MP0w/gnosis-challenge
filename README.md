@@ -48,6 +48,7 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 
 - add tests
 - right now the profile API creates or updates the profile, while is not restful it seems like a better UX to me as the profile info are optional.
+- more separation of concerns in routers (controllers, validation, etc)
 
 ### Frontend
 

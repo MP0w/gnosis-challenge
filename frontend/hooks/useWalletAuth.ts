@@ -91,12 +91,12 @@ export function useWalletAuth(nonce: string) {
           createMessage?.(nonce) ??
           createSiweMessage(window, signer.address, "Sign in", nonce);
 
-        signIn({
+        await signIn({
           signer,
           message,
         });
       } catch (err) {
-        console.info("user rejected", err);
+        console.info("user rejected:", err);
         setConnectedWallet(undefined);
       }
     },
