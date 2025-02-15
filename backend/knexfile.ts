@@ -2,7 +2,7 @@ import { configDotenv } from "dotenv";
 import type { Knex } from "knex";
 
 configDotenv({ path: ".env" });
-configDotenv({ path: ".env.local", override: true });
+configDotenv({ path: ".env.production", override: true });
 
 if (
   !process.env.DB_HOST ||
