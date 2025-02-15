@@ -28,7 +28,16 @@ export function authRouter(di: AppDependencies) {
         return;
       }
 
-      const { message, signature } = signInSchema.parse(req.body);
+      const { success: valid, data } = signInSchema.safeParse(req.body);
+
+      if (!valid || !data) {
+        res.status(422).json({
+          message: "Invalid sign in data",
+        });
+        return;
+      }
+
+      const { message, signature } = data;
 
       const verifiedMessage = await di.userService.verifyUser({
         nonce: req.session.nonce,

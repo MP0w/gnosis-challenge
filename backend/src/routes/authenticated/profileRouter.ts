@@ -28,10 +28,17 @@ export function profileRouter(di: AppDependencies) {
     "/",
     authenticatedAsyncHandler(
       async (req: AuthenticatedRequest, res: Response) => {
-        const profileData = profileSchema.parse({
+        const { success: valid, data: profileData } = profileSchema.safeParse({
           username: req.body.username,
           bio: req.body.bio,
         });
+
+        if (!profileData || !valid) {
+          res.status(422).json({
+            message: "Invalid profile data",
+          });
+          return;
+        }
 
         const profile = await di.profileService.createOrUpdateProfile(
           req.session.user.id,
