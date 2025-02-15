@@ -24,10 +24,11 @@ export function setupRoutes(app: Application, dependencies: AppDependencies) {
       resave: true,
       saveUninitialized: true,
       cookie: {
-        secure: process.env.COOKIE_DOMAIN ? true : false,
+        secure: true,
         sameSite: "none",
+        httpOnly: true,
         maxAge: 1000 * 60 * 60 * 24 * 30,
-        domain: process.env.COOKIE_DOMAIN,
+        path: "/",
       },
     })
   );
