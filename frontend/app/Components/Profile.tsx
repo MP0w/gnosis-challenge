@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { useAuthContext, User } from "../contexts/AuthContext";
 import { useProfile } from "@/hooks/useProfile";
 
@@ -7,14 +7,24 @@ function ProfileContent({ user }: { user: User }) {
   const [username, setUsername] = useState("");
   const [bio, setBio] = useState("");
 
-  useEffect(() => {
+  const resetForm = useCallback(() => {
     setUsername(profile?.username ?? "");
     setBio(profile?.bio ?? "");
   }, [profile]);
 
   useEffect(() => {
+    resetForm();
+  }, [profile, resetForm]);
+
+  useEffect(() => {
     fetchProfile();
   }, [fetchProfile]);
+
+  useEffect(() => {
+    if (error) {
+      alert("Failed to update profile. Please try again.");
+    }
+  }, [error]);
 
   const save = () => {
     if (username !== profile?.username || bio !== profile?.bio) {
@@ -30,8 +40,7 @@ function ProfileContent({ user }: { user: User }) {
       </div>
 
       {loading && <p>Loading...</p>}
-      {error && <p>Error: {error.message}</p>}
-      {!loading && !error && (
+      {!loading && (
         <div className="space-y-4">
           <div>
             <label

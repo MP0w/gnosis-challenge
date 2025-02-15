@@ -6,7 +6,7 @@ interface Profile {
   bio: string;
 }
 
-async function getProfile() {
+async function getProfile(): Promise<Profile> {
   const response = await fetch(`${API_BASE_URL}/profile`, {
     credentials: "include",
   });
@@ -18,7 +18,7 @@ async function getProfile() {
   return response.json();
 }
 
-async function updateProfile(data: Partial<Profile>) {
+async function updateProfile(data: Partial<Profile>): Promise<Profile> {
   const response = await fetch(`${API_BASE_URL}/profile`, {
     method: "PUT",
     body: JSON.stringify(data),
@@ -41,14 +41,14 @@ export function useProfile() {
   const [error, setError] = useState<Error | undefined>(undefined);
 
   const executeProfileAction = useCallback(
-    async <T>(action: () => Promise<T>) => {
+    async (action: () => Promise<Profile>) => {
       setLoading(true);
       setError(undefined);
       try {
-        return await action();
+        const data = await action();
+        setProfile(data);
       } catch (err) {
         setError(err instanceof Error ? err : new Error("Unknown error"));
-        throw err;
       } finally {
         setLoading(false);
       }
@@ -56,17 +56,13 @@ export function useProfile() {
     []
   );
 
-  const fetchProfile = useCallback(async () => {
-    const data = await executeProfileAction(getProfile);
-    setProfile(data);
+  const fetchProfile = useCallback(() => {
+    executeProfileAction(getProfile);
   }, [executeProfileAction]);
 
   const saveProfile = useCallback(
-    async (data: Partial<Profile>) => {
-      const updatedProfile = await executeProfileAction(() =>
-        updateProfile(data)
-      );
-      setProfile(updatedProfile);
+    (data: Profile) => {
+      executeProfileAction(() => updateProfile(data));
     },
     [executeProfileAction]
   );

@@ -80,23 +80,25 @@ export function useWalletAuth(nonce: string) {
       messageSigner?: Signer,
       createMessage?: (nonce: string) => string
     ) => {
-      const signer = messageSigner ?? (await getBrowserSigner(window));
-      if (!signer) {
-        setConnectedWallet(null);
-        return;
-      }
+      try {
+        const signer = messageSigner ?? (await getBrowserSigner(window));
+        if (!signer) {
+          setConnectedWallet(null);
+          return;
+        }
 
-      const message =
-        createMessage?.(nonce) ??
-        createSiweMessage(window, signer.address, "Sign in", nonce);
+        const message =
+          createMessage?.(nonce) ??
+          createSiweMessage(window, signer.address, "Sign in", nonce);
 
-      signIn({
-        signer,
-        message,
-      }).catch(() => {
-        console.info("user rejected");
+        signIn({
+          signer,
+          message,
+        });
+      } catch (err) {
+        console.info("user rejected", err);
         setConnectedWallet(undefined);
-      });
+      }
     },
     [signIn, nonce]
   );
