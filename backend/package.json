@@ -10,7 +10,8 @@
     "dev": "tsc && npx nodemon -x ts-node -e ts .",
     "knex": "NODE_ENV=development NODE_OPTIONS='--import tsx/esm' knex",
     "migrate": "npm run knex migrate:latest",
-    "codegen": "ts-node generateTypes.ts"
+    "codegen": "ts-node generateTypes.ts",
+    "test": "jest"
   },
   "dependencies": {
     "cors": "^2.8.5",
@@ -29,9 +30,14 @@
     "@types/cors": "^2.8.17",
     "@types/express": "^4.17.21",
     "@types/express-session": "^1.18.1",
+    "@types/jest": "^29.5.14",
     "@types/node": "^20",
+    "@types/supertest": "^6.0.2",
+    "jest": "^29.7.0",
     "knex-types": "^0.5.0",
     "nodemon": "^3.1.4",
+    "supertest": "^7.0.0",
+    "ts-jest": "^29.2.5",
     "ts-node": "^10.9.2",
     "tsx": "^4.19.0",
     "typescript": "^5.5.4"
