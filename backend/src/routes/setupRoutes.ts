@@ -17,6 +17,10 @@ export function setupRoutes(app: Application, dependencies: AppDependencies) {
     })
   );
 
+  if (process.env.NODE_ENV === "production") {
+    app.set("trust proxy", 1);
+  }
+
   app.use(
     session({
       name: process.env.SESSION_COOKIE_NAME!,
@@ -26,6 +30,12 @@ export function setupRoutes(app: Application, dependencies: AppDependencies) {
       cookie: {
         secure: process.env.NODE_ENV === "production",
         maxAge: 1000 * 60 * 60 * 24 * 30,
+        sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+        httpOnly: true,
+        domain:
+          process.env.NODE_ENV === "production"
+            ? process.env.COOKIE_DOMAIN
+            : undefined,
       },
     })
   );
