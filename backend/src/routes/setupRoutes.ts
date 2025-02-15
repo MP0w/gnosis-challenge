@@ -24,8 +24,8 @@ export function setupRoutes(app: Application, dependencies: AppDependencies) {
       resave: true,
       saveUninitialized: true,
       cookie: {
-        secure: process.env.NODE_ENV === "production",
-        sameSite: process.env.NODE_ENV === "production",
+        secure: process.env.COOKIE_DOMAIN ? true : false,
+        sameSite: "none",
         maxAge: 1000 * 60 * 60 * 24 * 30,
         domain: process.env.COOKIE_DOMAIN,
       },
