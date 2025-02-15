@@ -1,20 +1,17 @@
-import { Application, Router, Response } from "express";
+import { Router, Response } from "express";
 import { generateNonce, SiweError, SiweErrorType } from "siwe";
-import { RequestWithSession } from "./sessionAuth";
+import { RequestWithSession } from "../sessionAuth";
 import getUuidByString from "uuid-by-string";
-import { dbConnection } from "../dbConnection";
-import { UserService } from "../services/userService";
-import { UserRepository } from "../repositories/userRepository";
 import { z } from "zod";
+import { AppDependencies } from "../dependencies";
 
 const signInSchema = z.object({
   message: z.string(),
   signature: z.string(),
 });
 
-export function authRouter(_: Application) {
+export function authRouter(di: AppDependencies) {
   const router = Router();
-  const userService = new UserService(new UserRepository(dbConnection));
 
   router.get("/nonce", (req: RequestWithSession, res: Response) => {
     req.session.nonce = generateNonce();
@@ -33,7 +30,7 @@ export function authRouter(_: Application) {
 
       const { message, signature } = signInSchema.parse(req.body);
 
-      const verifiedMessage = await userService.verifyUser({
+      const verifiedMessage = await di.userService.verifyUser({
         nonce: req.session.nonce,
         message,
         signature,
@@ -48,7 +45,7 @@ export function authRouter(_: Application) {
         req.session.cookie.expires = new Date(verifiedMessage.expirationTime);
       }
 
-      const user = await userService.createOrUpdateUser({
+      const user = await di.userService.createOrUpdateUser({
         id: req.session.user.id,
         address: req.session.user.siwe.address,
       });

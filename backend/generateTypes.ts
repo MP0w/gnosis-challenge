@@ -1,5 +1,5 @@
 import { updateTypes } from "knex-types";
-import { dbConnection } from "./dbConnection";
+import { dbConnection } from "./src/dbConnection";
 import { Transform, Writable } from "stream";
 import { createWriteStream } from "fs";
 
@@ -26,7 +26,7 @@ const transformer = new Transform({
   },
 });
 
-const output = createWriteStream("./dbTypes.ts");
+const output = createWriteStream("./src/dbTypes.ts");
 
 const combinedStream = new Writable({
   write(chunk, encoding, callback) {

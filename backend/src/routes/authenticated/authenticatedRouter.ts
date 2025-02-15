@@ -1,8 +1,9 @@
-import { Application, NextFunction, Router, Response } from "express";
+import { NextFunction, Router, Response } from "express";
 import { profileRouter } from "./profileRouter";
-import { RequestWithSession } from "../sessionAuth";
+import { RequestWithSession } from "../../routes/sessionAuth";
+import { AppDependencies } from "../dependencies";
 
-export function authenticatedRouter(_: Application) {
+export function authenticatedRouter(dependencies: AppDependencies) {
   const router = Router();
 
   router.use((req: RequestWithSession, res: Response, next: NextFunction) => {
@@ -13,7 +14,7 @@ export function authenticatedRouter(_: Application) {
     next();
   });
 
-  profileRouter(router);
+  profileRouter(router, dependencies);
 
   return router;
 }

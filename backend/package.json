@@ -1,12 +1,12 @@
 {
   "name": "backend",
   "version": "1.0.0",
-  "main": "index.ts",
+  "main": "src/index.ts",
   "license": "MIT",
   "scripts": {
     "build": "NODE_ENV=production tsc",
     "typecheck": "tsc --noEmit",
-    "start": "NODE_ENV=production node dist/index.js",
+    "start": "NODE_ENV=production node dist/src/index.js",
     "dev": "tsc && npx nodemon -x ts-node -e ts .",
     "knex": "NODE_ENV=development NODE_OPTIONS='--import tsx/esm' knex",
     "migrate": "npm run knex migrate:latest",

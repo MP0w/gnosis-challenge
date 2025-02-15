@@ -87,6 +87,6 @@
     // This improves issue grouping in Sentry.
     "sourceRoot": "/"
   },
-  "include": ["./**/*.ts", "index.ts", "knexfile.ts"], // Include all TypeScript files in the "src" folder.
+  "include": ["./**/*.ts", "src/index.ts", "knexfile.ts"], // Include all TypeScript files in the "src" folder.
   "exclude": ["node_modules", "dist"] // Exclude "node_modules" and output directory.
 }
