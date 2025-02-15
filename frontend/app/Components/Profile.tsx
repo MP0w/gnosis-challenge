@@ -3,7 +3,7 @@ import { useAuthContext, User } from "../contexts/AuthContext";
 import { useProfile } from "@/hooks/useProfile";
 
 function ProfileContent({ user }: { user: User }) {
-  const { profile, fetchProfile, saveProfile, loading, error } = useProfile();
+  const { profile, loading, error, getProfile, updateProfile } = useProfile();
   const [username, setUsername] = useState("");
   const [bio, setBio] = useState("");
 
@@ -17,8 +17,8 @@ function ProfileContent({ user }: { user: User }) {
   }, [profile, resetForm]);
 
   useEffect(() => {
-    fetchProfile();
-  }, [fetchProfile]);
+    getProfile();
+  }, [getProfile]);
 
   useEffect(() => {
     if (error) {
@@ -28,7 +28,7 @@ function ProfileContent({ user }: { user: User }) {
 
   const save = () => {
     if (username !== profile?.username || bio !== profile?.bio) {
-      saveProfile({ username, bio });
+      updateProfile({ username, bio });
     }
   };
 

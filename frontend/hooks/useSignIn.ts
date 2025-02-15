@@ -1,36 +1,25 @@
-import { useCallback, useState } from "react";
-import { API_BASE_URL } from "./baseURL";
 import { User } from "@/app/contexts/AuthContext";
-
-async function signIn(message: string, signature: string) {
-  const response = await fetch(`${API_BASE_URL}/sign-in`, {
-    method: "POST",
-    body: JSON.stringify({ message, signature }),
-    headers: {
-      "Content-Type": "application/json",
-    },
-    credentials: "include",
-  });
-
-  if (!response.ok) {
-    throw new Error("Failed to sign in");
-  }
-
-  return response.json();
-}
+import { useApiCall } from "./useApiCall";
+import { useCallback } from "react";
 
 export function useSignIn() {
-  const [signedInUser, setSignedInUser] = useState<User | undefined>(undefined);
+  const { data, execute, loading, error } = useApiCall<User>(
+    "POST",
+    "/sign-in"
+  );
 
-  const callback = useCallback(async (message: string, signature: string) => {
-    signIn(message, signature)
-      .then((user) => {
-        setSignedInUser(user);
-      })
-      .catch(() => {
-        setSignedInUser(undefined);
-      });
-  }, []);
+  const signIn = useCallback(
+    (message: string, signature: string) =>
+      execute({
+        body: JSON.stringify({ message, signature }),
+      }),
+    [execute]
+  );
 
-  return { signIn: callback, signedInUser };
+  return {
+    signedInUser: data,
+    signIn,
+    loading,
+    error,
+  };
 }

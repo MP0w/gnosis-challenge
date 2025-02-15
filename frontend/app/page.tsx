@@ -7,13 +7,13 @@ import { Profile } from "./components/Profile";
 import { AuthProvider } from "./contexts/AuthContext";
 
 export default function Home() {
-  const { nonce, getNonce } = useNonce();
+  const { data, execute: getNonce } = useNonce();
 
   useEffect(() => {
     getNonce();
   }, [getNonce]);
 
-  if (!nonce) {
+  if (!data?.nonce) {
     return <>Loading...</>;
   }
 
@@ -21,7 +21,7 @@ export default function Home() {
     <AuthProvider>
       <div className="m-8 flex flex-col items-center justify-center space-y-8">
         <h1 className="text-3xl font-bold">_gnosis_challenge_</h1>
-        <ConnectWallet nonce={nonce} />
+        <ConnectWallet nonce={data.nonce} />
         <Profile />
       </div>
     </AuthProvider>

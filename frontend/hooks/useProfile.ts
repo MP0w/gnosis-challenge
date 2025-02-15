@@ -1,71 +1,75 @@
-import { useCallback, useState } from "react";
-import { API_BASE_URL } from "./baseURL";
+import { useCallback, useEffect, useState } from "react";
+import { useApiCall } from "./useApiCall";
 
 interface Profile {
   username: string;
   bio: string;
 }
 
-async function getProfile(): Promise<Profile> {
-  const response = await fetch(`${API_BASE_URL}/profile`, {
-    credentials: "include",
-  });
-
-  if (!response.ok) {
-    throw new Error("Failed to get profile");
-  }
-
-  return response.json();
+function useGetProfile() {
+  return useApiCall<Profile>("GET", "/profile");
 }
 
-async function updateProfile(data: Partial<Profile>): Promise<Profile> {
-  const response = await fetch(`${API_BASE_URL}/profile`, {
-    method: "PUT",
-    body: JSON.stringify(data),
-    headers: {
-      "Content-Type": "application/json",
-    },
-    credentials: "include",
-  });
+function useUpdateProfile() {
+  const { data, execute, loading, error } = useApiCall<Profile>(
+    "PUT",
+    "/profile"
+  );
 
-  if (!response.ok) {
-    throw new Error("Failed to update profile");
-  }
+  const updateProfile = useCallback(
+    (data: Profile) =>
+      execute({
+        body: JSON.stringify(data),
+      }),
+    [execute]
+  );
 
-  return response.json();
+  return {
+    updatedProfile: data,
+    updateProfile,
+    updateProfileLoading: loading,
+    updateProfileError: error,
+  };
 }
 
 export function useProfile() {
-  const [profile, setProfile] = useState<Profile | undefined>(undefined);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<Error | undefined>(undefined);
+  const {
+    data,
+    loading: profileLoading,
+    error: profileError,
+    execute: getProfile,
+  } = useGetProfile();
+  const {
+    updatedProfile,
+    updateProfile,
+    updateProfileLoading,
+    updateProfileError,
+  } = useUpdateProfile();
 
-  const executeProfileAction = useCallback(
-    async (action: () => Promise<Profile>) => {
-      setLoading(true);
-      setError(undefined);
-      try {
-        const data = await action();
-        setProfile(data);
-      } catch (err) {
-        setError(err instanceof Error ? err : new Error("Unknown error"));
-      } finally {
-        setLoading(false);
-      }
-    },
-    []
+  const [loading, setLoading] = useState(
+    profileLoading || updateProfileLoading
   );
+  const [error, setError] = useState(profileError || updateProfileError);
 
-  const fetchProfile = useCallback(() => {
-    executeProfileAction(getProfile);
-  }, [executeProfileAction]);
+  const [profile, setProfile] = useState(updatedProfile || data);
 
-  const saveProfile = useCallback(
-    (data: Profile) => {
-      executeProfileAction(() => updateProfile(data));
-    },
-    [executeProfileAction]
-  );
+  useEffect(() => {
+    setLoading(profileLoading || updateProfileLoading);
+  }, [profileLoading, updateProfileLoading]);
 
-  return { profile, loading, error, fetchProfile, saveProfile };
+  useEffect(() => {
+    setError(updateProfileError || profileError);
+  }, [profileError, updateProfileError]);
+
+  useEffect(() => {
+    setProfile(updatedProfile || data);
+  }, [updatedProfile, data]);
+
+  return {
+    profile,
+    loading,
+    error,
+    updateProfile,
+    getProfile,
+  };
 }
