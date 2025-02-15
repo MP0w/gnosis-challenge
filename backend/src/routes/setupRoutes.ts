@@ -12,7 +12,7 @@ export function setupRoutes(app: Application, dependencies: AppDependencies) {
 
   app.use(
     cors({
-      origin: true,
+      origin: process.env.CORS_ORIGIN || "http://localhost:3000",
       credentials: true,
     })
   );
