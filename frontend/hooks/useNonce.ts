@@ -1,6 +1,5 @@
 import { useCallback, useState } from "react";
-
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4000";
+import { API_BASE_URL } from "./baseURL";
 
 async function getNonce() {
   const response = await fetch(`${API_BASE_URL}/nonce`, {

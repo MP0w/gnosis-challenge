@@ -11,9 +11,11 @@ const profileSchema = z.object({
   bio: z.string().max(255).nullable(),
 });
 
-export function profileRouter(router: Router, di: AppDependencies) {
+export function profileRouter(di: AppDependencies) {
+  const router = Router();
+
   router.get(
-    "/profile",
+    "/",
     authenticatedAsyncHandler(
       async (req: AuthenticatedRequest, res: Response) => {
         const profile = await di.profileService.getProfile(req.session.user.id);
@@ -23,7 +25,7 @@ export function profileRouter(router: Router, di: AppDependencies) {
   );
 
   router.put(
-    "/profile",
+    "/",
     authenticatedAsyncHandler(
       async (req: AuthenticatedRequest, res: Response) => {
         const profileData = profileSchema.parse({

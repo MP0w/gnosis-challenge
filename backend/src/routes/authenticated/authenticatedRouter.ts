@@ -14,7 +14,7 @@ export function authenticatedRouter(dependencies: AppDependencies) {
     next();
   });
 
-  profileRouter(router, dependencies);
+  router.use("/profile", profileRouter(dependencies));
 
   return router;
 }

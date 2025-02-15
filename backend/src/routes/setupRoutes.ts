@@ -31,9 +31,9 @@ export function setupRoutes(app: Application, dependencies: AppDependencies) {
     })
   );
 
-  app.use(authRouter(dependencies));
+  app.use("/api", authRouter(dependencies));
 
-  app.use(authenticatedRouter(dependencies));
+  app.use("/api", authenticatedRouter(dependencies));
 
   // Add error handling middleware
   app.use((err: Error, req: Request, res: Response, _: NextFunction) => {
