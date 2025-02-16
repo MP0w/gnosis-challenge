@@ -53,7 +53,10 @@ describe("UserService", () => {
 
       const result = await userService.getUser(mockUser.id);
 
-      expect(result).toEqual(mockUser);
+      expect(result).toEqual({
+        id: mockUser.id,
+        address: mockUser.address,
+      });
       expect(mockUserRepository.getById).toHaveBeenCalledWith(mockUser.id);
     });
 
@@ -77,7 +80,10 @@ describe("UserService", () => {
 
       const result = await userService.createOrUpdateUser(createUserArgs);
 
-      expect(result).toEqual(mockUser);
+      expect(result).toEqual({
+        id: mockUser.id,
+        address: mockUser.address,
+      });
       expect(mockUserRepository.createOrUpdate).toHaveBeenCalledWith(
         createUserArgs
       );

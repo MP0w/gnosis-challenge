@@ -1,9 +1,17 @@
 import { SiweMessage } from "siwe";
-import { Users } from "../dbTypes";
 import { UserRepository } from "../repositories/userRepository";
+import { UserDto } from "../entities/userDto";
+import { Users } from "../dbTypes";
 
 export class UserService {
   constructor(private readonly userRepository: UserRepository) {}
+
+  private makeUserDto(user: Users): UserDto {
+    return {
+      id: user.id,
+      address: user.address,
+    };
+  }
 
   async verifyUser(args: {
     message: string;
@@ -19,14 +27,15 @@ export class UserService {
     return message;
   }
 
-  async getUser(id: string): Promise<Users | undefined> {
-    return await this.userRepository.getById(id);
+  async getUser(id: string): Promise<UserDto | undefined> {
+    const user = await this.userRepository.getById(id);
+    return user ? this.makeUserDto(user) : undefined;
   }
 
   async createOrUpdateUser(args: {
     id: string;
     address: string;
-  }): Promise<Users> {
-    return await this.userRepository.createOrUpdate(args);
+  }): Promise<UserDto> {
+    return this.makeUserDto(await this.userRepository.createOrUpdate(args));
   }
 }
