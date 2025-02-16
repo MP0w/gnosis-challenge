@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { useAuthContext, User } from "../contexts/AuthContext";
 import { useProfile } from "@/hooks/useProfile";
+import { BioInput } from "./BioInput";
 
 function ProfileContent({ user }: { user: User }) {
   const { profile, loading, error, getProfile, updateProfile } = useProfile();
@@ -78,20 +79,14 @@ function ProfileContent({ user }: { user: User }) {
   return (
     <div>
       <div className="mb-4">
-        <b>Logged in with address</b>
+        <b>Signed in with address</b>
         <p>{user.address}</p>
       </div>
 
       {loading && <p>Loading...</p>}
       {!loading && (
         <div className="space-y-4">
-          <div>
-            <label
-              htmlFor="username"
-              className="block text-sm font-medium mb-1"
-            >
-              Username
-            </label>
+          <BioInput id="username" label="Username" error={usernameError}>
             <input
               type="text"
               id="username"
@@ -103,15 +98,9 @@ function ProfileContent({ user }: { user: User }) {
               }`}
               placeholder="Enter username"
             />
-            {usernameError && (
-              <p className="text-red-500 text-sm mt-1">{usernameError}</p>
-            )}
-          </div>
+          </BioInput>
 
-          <div>
-            <label htmlFor="bio" className="block text-sm font-medium mb-1">
-              Bio
-            </label>
+          <BioInput id="bio" label="Bio" error={bioError}>
             <textarea
               id="bio"
               value={bio}
@@ -123,10 +112,7 @@ function ProfileContent({ user }: { user: User }) {
               rows={4}
               placeholder="Tell us about yourself"
             />
-            {bioError && (
-              <p className="text-red-500 text-sm mt-1">{bioError}</p>
-            )}
-          </div>
+          </BioInput>
         </div>
       )}
     </div>

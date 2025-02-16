@@ -57,3 +57,4 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 - only works with browser wallet, not wallet connect
 - add more tests (just added test for one of the hooks to demonstrate how I would add tests)
 - proper error / loading states
+- nicer UI :D
