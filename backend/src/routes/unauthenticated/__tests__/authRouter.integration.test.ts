@@ -103,28 +103,9 @@ describe("Auth Router", () => {
       expect(response.body).toEqual(mockUser);
     });
 
-    it("should handle expired message error", async () => {
+    it("should handle signature errors", async () => {
       mockUserService.verifyUser.mockRejectedValue(
-        new SiweError(SiweErrorType.EXPIRED_MESSAGE)
-      );
-
-      const agent = request.agent(app);
-      await agent.get("/nonce"); // Set nonce in session
-
-      const response = await agent
-        .post("/sign-in")
-        .send({
-          message: "test message",
-          signature: "test signature",
-        })
-        .expect(440);
-
-      expect(response.body).toBeDefined();
-    });
-
-    it("should handle invalid signature error", async () => {
-      mockUserService.verifyUser.mockRejectedValue(
-        new SiweError(SiweErrorType.INVALID_SIGNATURE)
+        new SiweError(SiweErrorType.NONCE_MISMATCH)
       );
 
       const agent = request.agent(app);

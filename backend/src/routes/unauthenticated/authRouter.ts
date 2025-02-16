@@ -1,5 +1,5 @@
 import { Router, Response } from "express";
-import { generateNonce, SiweError, SiweErrorType } from "siwe";
+import { generateNonce, SiweError } from "siwe";
 import { RequestWithSession } from "../sessionAuth";
 import getUuidByString from "uuid-by-string";
 import { z } from "zod";
@@ -66,23 +66,9 @@ export function authRouter(di: AppDependencies) {
       console.error("Error signing in", e);
 
       const type = e instanceof SiweError ? e.type : undefined;
-      const message = e instanceof Error ? e.message : `${e}`;
+      const message = e instanceof Error ? e.message : `${e} ${type}`;
 
-      const statusCode = () => {
-        switch (type) {
-          case SiweErrorType.EXPIRED_MESSAGE: {
-            return 440;
-          }
-          case SiweErrorType.INVALID_SIGNATURE: {
-            return 422;
-          }
-          default: {
-            return 500;
-          }
-        }
-      };
-
-      req.session.save(() => res.status(statusCode()).json({ message }));
+      req.session.save(() => res.status(type ? 422 : 500).json({ message }));
     }
   });
 
