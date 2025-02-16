@@ -7,28 +7,26 @@ import { useNonce } from "@/hooks/useNonce";
 export function ConnectWallet() {
   const { user, setUser } = useAuthContext();
   const { execute: getNonce } = useNonce();
-  const { connectedWallet, connect, disconnect } = useWalletAuth(getNonce);
+  const { connectedWallet, connect } = useWalletAuth(getNonce);
 
   const logout = useCallback(() => {
-    disconnect();
     setUser(null);
-  }, [disconnect, setUser]);
+  }, [setUser]);
 
-  const { signIn, signedInUser } = useSignIn();
+  const { signIn } = useSignIn();
 
   useEffect(() => {
     if (connectedWallet) {
-      signIn(connectedWallet.message, connectedWallet.signature);
+      signIn(connectedWallet.message, connectedWallet.signature)
+        .then((user) => {
+          setUser(user);
+        })
+        .catch(() => {
+          logout();
+        });
     }
-  }, [connectedWallet, signIn]);
+  }, [connectedWallet, signIn, setUser, logout]);
 
-  useEffect(() => {
-    if (!signedInUser) {
-      disconnect();
-    }
-
-    setUser(signedInUser ?? null);
-  }, [signedInUser, disconnect, setUser]);
 
   const buttonStyle = "text-white font-bold py-2 px-4 rounded";
   return (

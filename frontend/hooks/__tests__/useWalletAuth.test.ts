@@ -63,21 +63,4 @@ describe("useWalletAuth", () => {
     expect(result.current.connectedWallet?.message).toBe("message");
     expect(result.current.connectedWallet?.signature).toBe("yup");
   });
-
-  it("should disconnect successfully", async () => {
-    const { result } = renderHook(() => useWalletAuth(getNonce));
-
-    mockSigner.signMessage = jest.fn().mockResolvedValue("yup");
-
-    await act(async () => {
-      await result.current.connect(mockWindow, mockSigner, () => "message");
-    });
-    expect(result.current.connectedWallet).not.toBeUndefined();
-
-    // Then disconnect
-    await act(async () => {
-      await result.current.disconnect();
-    });
-    expect(result.current.connectedWallet).toBeUndefined();
-  });
 });

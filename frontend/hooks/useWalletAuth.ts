@@ -62,7 +62,7 @@ export function useWalletAuth(getNonce: () => Promise<{ nonce: string }>) {
     ConnectedWaller | undefined | null
   >(undefined);
 
-  const signIn = useCallback(
+  const signMessage = useCallback(
     async ({ signer, message }: { signer: Signer; message: string }) => {
       const signature = await signer.signMessage(message);
 
@@ -94,7 +94,7 @@ export function useWalletAuth(getNonce: () => Promise<{ nonce: string }>) {
           createMessage?.(nonce) ??
           createSiweMessage(window, signer.address, "Sign in", nonce);
 
-        await signIn({
+        await signMessage({
           signer,
           message,
         });
@@ -103,16 +103,11 @@ export function useWalletAuth(getNonce: () => Promise<{ nonce: string }>) {
         setConnectedWallet(undefined);
       }
     },
-    [signIn, getNonce]
+    [signMessage, getNonce]
   );
-
-  const disconnect = useCallback(async () => {
-    setConnectedWallet(undefined);
-  }, []);
 
   return {
     connectedWallet,
     connect,
-    disconnect,
   };
 }

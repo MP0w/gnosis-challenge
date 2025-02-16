@@ -1,5 +1,6 @@
 import { useCallback, useState } from "react";
 import { API_BASE_URL } from "./baseURL";
+import { useUserCache } from "@/app/contexts/UserCacheContext";
 
 export const useApiCall = <T>(
   method: "GET" | "POST" | "PUT" | "DELETE",
@@ -9,7 +10,7 @@ export const useApiCall = <T>(
   const [data, setData] = useState<T | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<Error | null>(null);
-
+  const { resetUserCache } = useUserCache();
   const execute = useCallback<(additionalParams?: RequestInit) => Promise<T>>(
     async (additionalParams?: RequestInit) => {
       setLoading(true);
@@ -29,10 +30,15 @@ export const useApiCall = <T>(
         });
 
         if (!response.ok) {
+          if (response.status === 401) {
+            resetUserCache();
+          }
+
           throw new Error(
             `API error: ${response.status} ${response.statusText}`
           );
         }
+
         const data = await response.json();
         setData(data);
 
@@ -44,7 +50,7 @@ export const useApiCall = <T>(
         setLoading(false);
       }
     },
-    [method, params, path]
+    [method, params, path, resetUserCache]
   );
 
   return { data, loading, error, execute };
