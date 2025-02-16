@@ -6,6 +6,10 @@ function ProfileContent({ user }: { user: User }) {
   const { profile, loading, error, getProfile, updateProfile } = useProfile();
   const [username, setUsername] = useState("");
   const [bio, setBio] = useState("");
+  const [usernameError, setUsernameError] = useState<string | undefined>(
+    undefined
+  );
+  const [bioError, setBioError] = useState<string | undefined>(undefined);
 
   const resetForm = useCallback(() => {
     setUsername(profile?.username ?? "");
@@ -26,7 +30,46 @@ function ProfileContent({ user }: { user: User }) {
     }
   }, [error]);
 
+  const validateUsername = (value: string) => {
+    if (
+      value.length < 3 ||
+      value.length > 30 ||
+      !/^[a-zA-Z0-9_-]+$/.test(value)
+    ) {
+      return false;
+    }
+
+    return true;
+  };
+
+  const validateBio = (value: string) => {
+    if (value.length > 255) {
+      return false;
+    }
+
+    return true;
+  };
+
+  const handleUsernameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setUsername(value);
+    setUsernameError(validateUsername(value) ? undefined : "Invalid username");
+  };
+
+  const handleBioChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const value = e.target.value;
+    setBio(value);
+    setBioError(validateBio(value) ? undefined : "Invalid bio");
+  };
+
   const save = () => {
+    const isValidUsername = validateUsername(username);
+    const isValidBio = validateBio(bio);
+
+    if (!isValidUsername || !isValidBio) {
+      return;
+    }
+
     if (username !== profile?.username || bio !== profile?.bio) {
       updateProfile({ username, bio });
     }
@@ -53,11 +96,16 @@ function ProfileContent({ user }: { user: User }) {
               type="text"
               id="username"
               value={username}
-              onChange={(e) => setUsername(e.target.value)}
+              onChange={handleUsernameChange}
               onBlur={save}
-              className="w-full px-3 py-2 border rounded-md text-black"
+              className={`w-full px-3 py-2 border rounded-md text-black ${
+                usernameError ? "border-red-500" : ""
+              }`}
               placeholder="Enter username"
             />
+            {usernameError && (
+              <p className="text-red-500 text-sm mt-1">{usernameError}</p>
+            )}
           </div>
 
           <div>
@@ -67,12 +115,17 @@ function ProfileContent({ user }: { user: User }) {
             <textarea
               id="bio"
               value={bio}
-              onChange={(e) => setBio(e.target.value)}
+              onChange={handleBioChange}
               onBlur={save}
-              className="w-full px-3 py-2 border rounded-md text-black"
+              className={`w-full px-3 py-2 border rounded-md text-black ${
+                bioError ? "border-red-500" : ""
+              }`}
               rows={4}
               placeholder="Tell us about yourself"
             />
+            {bioError && (
+              <p className="text-red-500 text-sm mt-1">{bioError}</p>
+            )}
           </div>
         </div>
       )}

@@ -2,14 +2,12 @@ import { useSignIn } from "@/hooks/useSignIn";
 import { useWalletAuth } from "@/hooks/useWalletAuth";
 import React, { useCallback, useEffect } from "react";
 import { useAuthContext } from "../contexts/AuthContext";
+import { useNonce } from "@/hooks/useNonce";
 
-interface ConnectWalletProps {
-  nonce: string;
-}
-
-export function ConnectWallet({ nonce }: ConnectWalletProps) {
+export function ConnectWallet() {
   const { user, setUser } = useAuthContext();
-  const { connectedWallet, connect, disconnect } = useWalletAuth(nonce);
+  const { execute: getNonce } = useNonce();
+  const { connectedWallet, connect, disconnect } = useWalletAuth(getNonce);
 
   const logout = useCallback(() => {
     disconnect();
@@ -34,7 +32,7 @@ export function ConnectWallet({ nonce }: ConnectWalletProps) {
 
   const buttonStyle = "text-white font-bold py-2 px-4 rounded";
   return (
-    <div>
+    <div className="flex flex-col gap-4 items-center">
       {user && (
         <button
           onClick={() => logout()}

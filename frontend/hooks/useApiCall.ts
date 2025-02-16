@@ -10,7 +10,7 @@ export const useApiCall = <T>(
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<Error | null>(null);
 
-  const execute = useCallback(
+  const execute = useCallback<(additionalParams?: RequestInit) => Promise<T>>(
     async (additionalParams?: RequestInit) => {
       setLoading(true);
       setError(null);

@@ -57,10 +57,11 @@ type ConnectedWaller = {
   signature: string;
 };
 
-export function useWalletAuth(nonce: string) {
+export function useWalletAuth(getNonce: () => Promise<{ nonce: string }>) {
   const [connectedWallet, setConnectedWallet] = useState<
     ConnectedWaller | undefined | null
   >(undefined);
+
   const signIn = useCallback(
     async ({ signer, message }: { signer: Signer; message: string }) => {
       const signature = await signer.signMessage(message);
@@ -87,6 +88,8 @@ export function useWalletAuth(nonce: string) {
           return;
         }
 
+        const { nonce } = await getNonce();
+
         const message =
           createMessage?.(nonce) ??
           createSiweMessage(window, signer.address, "Sign in", nonce);
@@ -100,7 +103,7 @@ export function useWalletAuth(nonce: string) {
         setConnectedWallet(undefined);
       }
     },
-    [signIn, nonce]
+    [signIn, getNonce]
   );
 
   const disconnect = useCallback(async () => {

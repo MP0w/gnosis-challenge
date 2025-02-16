@@ -7,7 +7,14 @@ import { z } from "zod";
 import { AppDependencies } from "../dependencies";
 
 const profileSchema = z.object({
-  username: z.string().min(3).max(30),
+  username: z
+    .string()
+    .min(3)
+    .max(30)
+    .regex(
+      /^[a-zA-Z0-9_-]+$/,
+      "Username can only contain letters, numbers, underscores, and hyphens"
+    ),
   bio: z.string().max(255).nullable(),
 });
 
